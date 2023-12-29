@@ -8,8 +8,12 @@ use Illuminate\Http\Request;
 class ApiInvoice extends Controller
 {
     public function index(Request $request){
+<<<<<<< HEAD
         try {
             $bodyResponseContent = json_decode(base64_decode($request->fileContent));
+=======
+    $bodyResponseContent = json_decode(base64_decode($request->fileContent));
+>>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
     $typeDocument='';
         switch ($bodyResponseContent->factura->IDE->codTipoDocumento) {
             case '01':
@@ -53,8 +57,16 @@ class ApiInvoice extends Controller
         $itemDescription->anticipo_documento_serie = "";
         $itemDescription->anticipo_documento_numero = "";
         $items[] =$itemDescription;
+<<<<<<< HEAD
 
 
+=======
+<<<<<<< HEAD
+=======
+
+        
+>>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
+>>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
     }
     $arrayRequest = array(
         "operacion" => "generar_comprobante",
@@ -131,6 +143,7 @@ class ApiInvoice extends Controller
             "pseRequests" => []
         );
     }
+<<<<<<< HEAD
         } catch (\Throwable $th) {
             \Log::error($th);
             return response()->json(['success' => false, 'message' => 'Estructura JSON inválida, consule el log'],500);
@@ -213,5 +226,64 @@ class ApiInvoice extends Controller
     }
     public function QueryInvoiceQR(Request $Request){
 
+=======
+    return response()->json($result_response, 200);
+    }
+    public function QueryInvoice(Request $Request){
+        $arrayRequest = array(
+            "operacion" => "consultar_comprobante",
+            "tipo_de_comprobante" => 1,
+            "serie" => "F050",
+            "numero" => 1,
+        );    
+        $url = NUBEFACT_URL;
+        $token = NUBEFACT_TOKEN;
+        $responseParsed = $arrayRequest;
+        $response = \Http::withToken($token)->post($url, $responseParsed );
+        if ($response->ok()){
+            $responseJson = json_decode($response);
+        } else {
+            $responseJson = json_decode($response);
+        }
+        return response()->json(['respuesta' => $responseJson], 200);
+    }
+    public function CancelInvoice(Request $Request){
+        $arrayRequest = array(
+            "operacion" => "generar_anulacion",
+            "tipo_de_comprobante" => 1,
+            "serie" => "F050",
+            "numero" => 1,
+            "motivo"=> "ERROR DEL SISTEMA",
+            "codigo_unico"=> "" 
+        );          
+        $url = NUBEFACT_URL;
+        $token = NUBEFACT_TOKEN;
+        $responseParsed = $arrayRequest;
+        $response = \Http::withToken($token)->post($url, $responseParsed );
+        if ($response->ok()){
+            $responseJson = json_decode($response);
+        } else {
+            $responseJson = json_decode($response);
+        }
+        return response()->json(['respuesta' => $responseJson], 200);
+    }
+    public function QueryInvoiceCanceled(Request $Request){
+        $arrayRequest = array(
+            "operacion" => "consultar_anulacion",
+            "tipo_de_comprobante" => 1,
+            "serie" => "F050",
+            "numero" => 1,
+        );    
+        $url = NUBEFACT_URL;
+        $token = NUBEFACT_TOKEN;
+        $responseParsed = $arrayRequest;
+        $response = \Http::withToken($token)->post($url, $responseParsed );
+        if ($response->ok()){
+            $responseJson = json_decode($response);
+        } else {
+            $responseJson = json_decode($response);
+        }
+        return response()->json(['respuesta' => $responseJson], 200);
+>>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
     }
 }
