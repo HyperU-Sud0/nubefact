@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 class ApiInvoice extends Controller
 {
     public function index(Request $request){
-    $bodyResponseContent = json_decode(base64_decode($request->fileContent));
+        try {
+            $bodyResponseContent = json_decode(base64_decode($request->fileContent));
     $typeDocument='';
         switch ($bodyResponseContent->factura->IDE->codTipoDocumento) {
             case '01':
@@ -53,7 +54,7 @@ class ApiInvoice extends Controller
         $itemDescription->anticipo_documento_numero = "";
         $items[] =$itemDescription;
 
-        
+
     }
     $arrayRequest = array(
         "operacion" => "generar_comprobante",
@@ -130,62 +131,87 @@ class ApiInvoice extends Controller
             "pseRequests" => []
         );
     }
+        } catch (\Throwable $th) {
+            \Log::error($th);
+            return response()->json(['success' => false, 'message' => 'Estructura JSON inválida, consule el log'],500);
+            }
     return response()->json($result_response, 200);
     }
-    public function QueryInvoice(Request $Request){
-        $arrayRequest = array(
-            "operacion" => "consultar_comprobante",
-            "tipo_de_comprobante" => 1,
-            "serie" => "F050",
-            "numero" => 1,
-        );    
-        $url = NUBEFACT_URL;
-        $token = NUBEFACT_TOKEN;
-        $responseParsed = $arrayRequest;
-        $response = \Http::withToken($token)->post($url, $responseParsed );
-        if ($response->ok()){
-            $responseJson = json_decode($response);
-        } else {
-            $responseJson = json_decode($response);
+    public function CancelInvoice(Request $request){
+        try {
+            $bodyResponseContent = json_decode(base64_decode($request->fileContent));
+            $serie_Number=explode('-', $bodyResponseContent->resumenComprobantes->DET[0]->numeracionItem);
+            $typeDocument='';
+            switch ($bodyResponseContent->resumenComprobantes->DET[0]->tipoComprobanteItem) {
+                case '01':
+                    $typeDocument = 1;
+                break;
+                case '03':
+                    $typeDocument = 2;
+                break;
+                case '07':
+                    $typeDocument = 3;
+                break;
+                case '08':
+                    $typeDocument = 4;
+                break;
+            }
+        $serie_Number=explode('-', $bodyResponseContent->resumenComprobantes->DET[0]->numeracionItem);
+            $arrayRequest = array(
+                "operacion" => "generar_anulacion",
+                "tipo_de_comprobante" => $typeDocument,
+                "serie" => $serie_Number[0],
+                "numero" => $serie_Number[1],
+                "motivo"=> "ANULACION GENERICA",
+                "codigo_unico"=> "" 
+            );          
+            $url = NUBEFACT_URL;
+            $token = NUBEFACT_TOKEN;
+            $responseParsed = $arrayRequest;
+            $response = \Http::withToken($token)->post($url, $responseParsed );
+            if ($response->ok()){
+                $responseJson = json_decode($response);
+                $result_response = array(
+                    "responseCode" => "0",
+                    "responseContent" => "Operacion exitosa",
+                    "pseRequests" => []
+                );
+            } else {
+                $responseJson = json_decode($response);
+                $result_response = array(
+                    "responseCode" => $responseJson->codigo,
+                    "responseContent" => $responseJson->errors,
+                    "pseRequests" => []
+                );
+            }
+        } catch (\Throwable $th) {
+        \Log::error($th);
+          return response()->json(['success' => false, 'message' => 'Estructura JSON inválida, consule el log'],500);
         }
-        return response()->json(['respuesta' => $responseJson], 200);
+        return response()->json($result_response, 200);
     }
-    public function CancelInvoice(Request $Request){
-        $arrayRequest = array(
-            "operacion" => "generar_anulacion",
-            "tipo_de_comprobante" => 1,
-            "serie" => "F050",
-            "numero" => 1,
-            "motivo"=> "ERROR DEL SISTEMA",
-            "codigo_unico"=> "" 
-        );          
-        $url = NUBEFACT_URL;
-        $token = NUBEFACT_TOKEN;
-        $responseParsed = $arrayRequest;
-        $response = \Http::withToken($token)->post($url, $responseParsed );
-        if ($response->ok()){
-            $responseJson = json_decode($response);
-        } else {
-            $responseJson = json_decode($response);
-        }
-        return response()->json(['respuesta' => $responseJson], 200);
+    // public function QueryInvoice(Request $Request){
+    //     $arrayRequest = array(
+    //         "operacion" => "consultar_comprobante",
+    //         "tipo_de_comprobante" => 1,
+    //         "serie" => "F050",
+    //         "numero" => 1,
+    //     );    
+    //     $url = NUBEFACT_URL;
+    //     $token = NUBEFACT_TOKEN;
+    //     $responseParsed = $arrayRequest;
+    //     $response = \Http::withToken($token)->post($url, $responseParsed );
+    //     if ($response->ok()){
+    //         $responseJson = json_decode($response);
+    //     } else {
+    //         $responseJson = json_decode($response);
+    //     }
+    //     return response()->json(['respuesta' => $responseJson], 200);
+    // }
+    public function QueryInvoiceXML(Request $Request){
+
     }
-    public function QueryInvoiceCanceled(Request $Request){
-        $arrayRequest = array(
-            "operacion" => "consultar_anulacion",
-            "tipo_de_comprobante" => 1,
-            "serie" => "F050",
-            "numero" => 1,
-        );    
-        $url = NUBEFACT_URL;
-        $token = NUBEFACT_TOKEN;
-        $responseParsed = $arrayRequest;
-        $response = \Http::withToken($token)->post($url, $responseParsed );
-        if ($response->ok()){
-            $responseJson = json_decode($response);
-        } else {
-            $responseJson = json_decode($response);
-        }
-        return response()->json(['respuesta' => $responseJson], 200);
+    public function QueryInvoiceQR(Request $Request){
+
     }
 }
