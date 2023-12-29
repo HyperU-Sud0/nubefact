@@ -5017,21 +5017,6 @@
         },
         {
             "name": "symfony/service-contracts",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-            "version": "v3.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/service-contracts.git",
-                "reference": "b3313c2dbffaf71c8de2934e2ea56ed2291a3838"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/b3313c2dbffaf71c8de2934e2ea56ed2291a3838",
-                "reference": "b3313c2dbffaf71c8de2934e2ea56ed2291a3838",
-=======
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
             "version": "v3.4.1",
             "source": {
                 "type": "git",
@@ -5042,23 +5027,11 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/service-contracts/zipball/fe07cbc8d837f60caf7018068e350cc5163681a0",
                 "reference": "fe07cbc8d837f60caf7018068e350cc5163681a0",
-<<<<<<< HEAD
-=======
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.1",
-<<<<<<< HEAD
                 "psr/container": "^1.1|^2.0"
-=======
-<<<<<<< HEAD
-                "psr/container": "^2.0"
-=======
-                "psr/container": "^1.1|^2.0"
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
             },
             "conflict": {
                 "ext-psr": "<1.1|>=2"
@@ -5106,15 +5079,7 @@
                 "standards"
             ],
             "support": {
-<<<<<<< HEAD
                 "source": "https://github.com/symfony/service-contracts/tree/v3.4.1"
-=======
-<<<<<<< HEAD
-                "source": "https://github.com/symfony/service-contracts/tree/v3.4.0"
-=======
-                "source": "https://github.com/symfony/service-contracts/tree/v3.4.1"
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
             },
             "funding": [
                 {
@@ -5130,15 +5095,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
             "time": "2023-12-26T14:02:43+00:00"
-=======
-<<<<<<< HEAD
-            "time": "2023-07-30T20:28:31+00:00"
-=======
-            "time": "2023-12-26T14:02:43+00:00"
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
         },
         {
             "name": "symfony/string",
@@ -5323,21 +5280,6 @@
         },
         {
             "name": "symfony/translation-contracts",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-            "version": "v3.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/translation-contracts.git",
-                "reference": "dee0c6e5b4c07ce851b462530088e64b255ac9c5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/translation-contracts/zipball/dee0c6e5b4c07ce851b462530088e64b255ac9c5",
-                "reference": "dee0c6e5b4c07ce851b462530088e64b255ac9c5",
-=======
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
             "version": "v3.4.1",
             "source": {
                 "type": "git",
@@ -5348,10 +5290,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/translation-contracts/zipball/06450585bf65e978026bda220cdebca3f867fde7",
                 "reference": "06450585bf65e978026bda220cdebca3f867fde7",
-<<<<<<< HEAD
-=======
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
                 "shasum": ""
             },
             "require": {
@@ -5400,15 +5338,7 @@
                 "standards"
             ],
             "support": {
-<<<<<<< HEAD
                 "source": "https://github.com/symfony/translation-contracts/tree/v3.4.1"
-=======
-<<<<<<< HEAD
-                "source": "https://github.com/symfony/translation-contracts/tree/v3.4.0"
-=======
-                "source": "https://github.com/symfony/translation-contracts/tree/v3.4.1"
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
             },
             "funding": [
                 {
@@ -5424,15 +5354,7 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
             "time": "2023-12-26T14:02:43+00:00"
-=======
-<<<<<<< HEAD
-            "time": "2023-07-25T15:08:44+00:00"
-=======
-            "time": "2023-12-26T14:02:43+00:00"
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
         },
         {
             "name": "symfony/uid",
@@ -6532,21 +6454,6 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-            "version": "9.2.29",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "6a3a87ac2bbe33b25042753df8195ba4aa534c76"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/6a3a87ac2bbe33b25042753df8195ba4aa534c76",
-                "reference": "6a3a87ac2bbe33b25042753df8195ba4aa534c76",
-=======
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
             "version": "9.2.30",
             "source": {
                 "type": "git",
@@ -6557,25 +6464,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/ca2bd87d2f9215904682a9cb9bb37dda98e76089",
                 "reference": "ca2bd87d2f9215904682a9cb9bb37dda98e76089",
-<<<<<<< HEAD
-=======
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "ext-libxml": "*",
                 "ext-xmlwriter": "*",
-<<<<<<< HEAD
                 "nikic/php-parser": "^4.18 || ^5.0",
-=======
-<<<<<<< HEAD
-                "nikic/php-parser": "^4.15",
-=======
-                "nikic/php-parser": "^4.18 || ^5.0",
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
                 "php": ">=7.3",
                 "phpunit/php-file-iterator": "^3.0.3",
                 "phpunit/php-text-template": "^2.0.2",
@@ -6625,15 +6520,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
                 "security": "https://github.com/sebastianbergmann/php-code-coverage/security/policy",
-<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/9.2.30"
-=======
-<<<<<<< HEAD
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/9.2.29"
-=======
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/9.2.30"
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
             },
             "funding": [
                 {
@@ -6641,15 +6528,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
             "time": "2023-12-22T06:47:57+00:00"
-=======
-<<<<<<< HEAD
-            "time": "2023-09-19T04:57:46+00:00"
-=======
-            "time": "2023-12-22T06:47:57+00:00"
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -7238,25 +7117,6 @@
         },
         {
             "name": "sebastian/complexity",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-            "version": "2.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sebastianbergmann/complexity.git",
-                "reference": "739b35e53379900cc9ac327b2147867b8b6efd88"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/complexity/zipball/739b35e53379900cc9ac327b2147867b8b6efd88",
-                "reference": "739b35e53379900cc9ac327b2147867b8b6efd88",
-                "shasum": ""
-            },
-            "require": {
-                "nikic/php-parser": "^4.7",
-=======
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
             "version": "2.0.3",
             "source": {
                 "type": "git",
@@ -7271,10 +7131,6 @@
             },
             "require": {
                 "nikic/php-parser": "^4.18 || ^5.0",
-<<<<<<< HEAD
-=======
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
                 "php": ">=7.3"
             },
             "require-dev": {
@@ -7306,15 +7162,7 @@
             "homepage": "https://github.com/sebastianbergmann/complexity",
             "support": {
                 "issues": "https://github.com/sebastianbergmann/complexity/issues",
-<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/complexity/tree/2.0.3"
-=======
-<<<<<<< HEAD
-                "source": "https://github.com/sebastianbergmann/complexity/tree/2.0.2"
-=======
-                "source": "https://github.com/sebastianbergmann/complexity/tree/2.0.3"
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
             },
             "funding": [
                 {
@@ -7322,15 +7170,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
             "time": "2023-12-22T06:19:30+00:00"
-=======
-<<<<<<< HEAD
-            "time": "2020-10-26T15:52:27+00:00"
-=======
-            "time": "2023-12-22T06:19:30+00:00"
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
         },
         {
             "name": "sebastian/diff",
@@ -7604,25 +7444,6 @@
         },
         {
             "name": "sebastian/lines-of-code",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-            "version": "1.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sebastianbergmann/lines-of-code.git",
-                "reference": "c1c2e997aa3146983ed888ad08b15470a2e22ecc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/lines-of-code/zipball/c1c2e997aa3146983ed888ad08b15470a2e22ecc",
-                "reference": "c1c2e997aa3146983ed888ad08b15470a2e22ecc",
-                "shasum": ""
-            },
-            "require": {
-                "nikic/php-parser": "^4.6",
-=======
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
             "version": "1.0.4",
             "source": {
                 "type": "git",
@@ -7637,10 +7458,6 @@
             },
             "require": {
                 "nikic/php-parser": "^4.18 || ^5.0",
-<<<<<<< HEAD
-=======
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
                 "php": ">=7.3"
             },
             "require-dev": {
@@ -7672,15 +7489,7 @@
             "homepage": "https://github.com/sebastianbergmann/lines-of-code",
             "support": {
                 "issues": "https://github.com/sebastianbergmann/lines-of-code/issues",
-<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/lines-of-code/tree/1.0.4"
-=======
-<<<<<<< HEAD
-                "source": "https://github.com/sebastianbergmann/lines-of-code/tree/1.0.3"
-=======
-                "source": "https://github.com/sebastianbergmann/lines-of-code/tree/1.0.4"
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
             },
             "funding": [
                 {
@@ -7688,15 +7497,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
             "time": "2023-12-22T06:20:34+00:00"
-=======
-<<<<<<< HEAD
-            "time": "2020-11-28T06:42:11+00:00"
-=======
-            "time": "2023-12-22T06:20:34+00:00"
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
         },
         {
             "name": "sebastian/object-enumerator",
@@ -8473,13 +8274,5 @@
         "php": "^8.0"
     },
     "platform-dev": [],
-<<<<<<< HEAD
-    "plugin-api-version": "2.6.0"
-=======
-<<<<<<< HEAD
     "plugin-api-version": "2.3.0"
-=======
-    "plugin-api-version": "2.6.0"
->>>>>>> 662304dc8113aa1bbc13bcb5185d64fa9ebba0fe
->>>>>>> 731a64b5a8f3ced84c0b3d2751605c77bca948c7
 }
