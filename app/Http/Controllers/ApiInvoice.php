@@ -52,6 +52,8 @@ class ApiInvoice extends Controller
         $itemDescription->anticipo_documento_serie = "";
         $itemDescription->anticipo_documento_numero = "";
         $items[] =$itemDescription;
+
+        
     }
     $arrayRequest = array(
         "operacion" => "generar_comprobante",
