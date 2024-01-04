@@ -4,16 +4,95 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ApiInvoice extends Controller
 {
     public function index(Request $request){
         try {
             $bodyResponseContent = json_decode(base64_decode($request->fileContent));
-    $bodyResponseContent = json_decode(base64_decode($request->fileContent));
-
+            \Log::info(base64_decode($request->fileContent));
+            $typeNoteCredit = "";
+            $typeNoteDebit = "";
+            $docModifyId = "";
+            $docModifySerie = "";
+            $docModifyNumber = "";
+            /** EMISION DE FACTURA */
+           if (isset($bodyResponseContent->factura)){
+            $requestCodTypeDocument = "01";
+            $requestSerie = $bodyResponseContent->factura->IDE->numeracion;
+            $requestDateEmition = $bodyResponseContent->factura->IDE->fechaEmision;
+            $requestDocType = $bodyResponseContent->factura->EMI->tipoDocId;
+            $requestDocNumber = $bodyResponseContent->factura->EMI->numeroDocId;
+            $requestCustomerName = $bodyResponseContent->factura->EMI->razonSocial;
+            $requestCustomerAddress= $bodyResponseContent->factura->EMI->direccion;
+            $requestGravada = $bodyResponseContent->factura->CAB->gravadas->totalVentas;
+            $requestTotalIgv =$bodyResponseContent->factura->CAB->totalImpuestos[0]->montoImpuesto;
+            $requestTotal =$bodyResponseContent->factura->CAB->importeTotal;
+            $requestItemsCount = $bodyResponseContent->factura->DET;
+           }
+           /** EMISION DE NOTA DE CREDITO */
+           if (isset($bodyResponseContent->notaCredito)){
+            $requestCodTypeDocument = "7";
+            $requestSerie = $bodyResponseContent->notaCredito->IDE->numeracion;
+            $requestDateEmition = $bodyResponseContent->notaCredito->IDE->fechaEmision;
+            $requestDocType = $bodyResponseContent->notaCredito->EMI->tipoDocId;
+            $requestDocNumber = $bodyResponseContent->notaCredito->EMI->numeroDocId;
+            $requestCustomerName = $bodyResponseContent->notaCredito->EMI->razonSocial;
+            $requestCustomerAddress= $bodyResponseContent->notaCredito->EMI->direccion;
+            $requestGravada = $bodyResponseContent->notaCredito->CAB->gravadas->totalVentas;
+            $requestTotalIgv =$bodyResponseContent->notaCredito->CAB->totalImpuestos[0]->montoImpuesto;
+            $requestTotal =$bodyResponseContent->notaCredito->CAB->importeTotal;
+            $requestItemsCount = $bodyResponseContent->notaCredito->DET;
+            $typeNoteCredit = (int)$bodyResponseContent->notaCredito->DRF[0]->codigoMotivo;
+            if (isset($bodyResponseContent->notaCredito->DRF[0]->tipoDocRelacionado)){
+                switch ($bodyResponseContent->notaCredito->DRF[0]->tipoDocRelacionado) {
+                case '01':
+                    $docModifyId = 1;
+                break;
+                case '03':
+                    $docModifyId = 2;
+                break;
+                }
+                if (isset($bodyResponseContent->notaCredito->DRF[0]->numeroDocRelacionado)){
+                    $docModifyExplode = explode('-', $bodyResponseContent->notaCredito->DRF[0]->numeroDocRelacionado);
+                    $docModifySerie = $docModifyExplode[0];
+                    $docModifyNumber = (int)$docModifyExplode[1];
+                }
+            }
+           } 
+            /** EMISION DE NOTA DE DEBITO */
+            if (isset($bodyResponseContent->notaDebito)){
+                $requestCodTypeDocument = "8";
+                $requestSerie = $bodyResponseContent->notaDebito->IDE->numeracion;
+                $requestDateEmition = $bodyResponseContent->notaDebito->IDE->fechaEmision;
+                $requestDocType = $bodyResponseContent->notaDebito->EMI->tipoDocId;
+                $requestDocNumber = $bodyResponseContent->notaDebito->EMI->numeroDocId;
+                $requestCustomerName = $bodyResponseContent->notaDebito->EMI->razonSocial;
+                $requestCustomerAddress= $bodyResponseContent->notaDebito->EMI->direccion;
+                $requestGravada = $bodyResponseContent->notaDebito->CAB->gravadas->totalVentas;
+                $requestTotalIgv =$bodyResponseContent->notaDebito->CAB->totalImpuestos[0]->montoImpuesto;
+                $requestTotal =$bodyResponseContent->notaDebito->CAB->importeTotal;
+                $requestItemsCount = $bodyResponseContent->notaDebito->DET;
+                $typeNoteDebit = (int)$bodyResponseContent->notaDebito->DRF[0]->codigoMotivo;
+                if (isset($bodyResponseContent->notaDebito->DRF[0]->tipoDocRelacionado)){
+                    switch ($bodyResponseContent->notaDebito->DRF[0]->tipoDocRelacionado) {
+                    case '01':
+                        $docModifyId = 1;
+                    break;
+                    case '03':
+                        $docModifyId = 2;
+                    break;
+                    }
+                    if (isset($bodyResponseContent->notaDebito->DRF[0]->numeroDocRelacionado)){
+                        $docModifyExplode = explode('-', $bodyResponseContent->notaDebito->DRF[0]->numeroDocRelacionado);
+                        $docModifySerie = $docModifyExplode[0];
+                        $docModifyNumber = (int)$docModifyExplode[1];
+                    }
+                }
+            } 
     $typeDocument='';
-        switch ($bodyResponseContent->factura->IDE->codTipoDocumento) {
+        switch ($requestCodTypeDocument) {
             case '01':
                 $typeDocument = 1;
             break;
@@ -27,17 +106,17 @@ class ApiInvoice extends Controller
                 $typeDocument = 4;
             break;
         }
-    $serie_Number=explode('-', $bodyResponseContent->factura->IDE->numeracion);
-    $dateEmition = \Carbon\Carbon::parse($bodyResponseContent->factura->IDE->fechaEmision)->format('d-m-Y');
-    $docType=(int)$bodyResponseContent->factura->EMI->tipoDocId;
-    $docNumber=$bodyResponseContent->factura->EMI->numeroDocId;
-    $customerName= $bodyResponseContent->factura->EMI->razonSocial;
-    $customerAddress= $bodyResponseContent->factura->EMI->direccion;
-    $gravada = $bodyResponseContent->factura->CAB->gravadas->totalVentas;
-    $totalIgv =$bodyResponseContent->factura->CAB->totalImpuestos[0]->montoImpuesto;
-    $total =$bodyResponseContent->factura->CAB->importeTotal;
+    $serie_Number=explode('-', $requestSerie);
+    $dateEmition = \Carbon\Carbon::parse($requestDateEmition)->format('d-m-Y');
+    $docType=(int)$requestDocType;
+    $docNumber=$requestDocNumber;
+    $customerName= $requestCustomerName;
+    $customerAddress= $requestCustomerAddress;
+    $gravada = $requestGravada;
+    $totalIgv =$requestTotalIgv;
+    $total =$requestTotal;
     $items = array();
-    foreach ($bodyResponseContent->factura->DET as $item) {
+    foreach ($requestItemsCount as $item) {
         $itemDescription = new \stdClass;
         $itemDescription->unidad_de_medida = $item->unidad;
         $itemDescription->codigo = "";
@@ -69,8 +148,7 @@ class ApiInvoice extends Controller
         "cliente_email" => "",
         "cliente_email_1" => "",
         "cliente_email_2" => "",
-        // "fecha_de_emision" => $dateEmition,
-        "fecha_de_emision" => "29/12/2023",
+        "fecha_de_emision" => $dateEmition,
         "fecha_de_vencimiento" => "",
         "moneda" => 1,
         "tipo_de_cambio" => "",
@@ -95,11 +173,11 @@ class ApiInvoice extends Controller
         "total_impuestos_bolsas"=> "",
         "detraccion"=> false,
         "observaciones"=> "",
-        "documento_que_se_modifica_tipo"=> "",
-        "documento_que_se_modifica_serie"=> "",
-        "documento_que_se_modifica_numero"=> "",
-        "tipo_de_nota_de_credito"=> "",
-        "tipo_de_nota_de_debito"=> "",
+        "documento_que_se_modifica_tipo"=>  $docModifyId,
+        "documento_que_se_modifica_serie"=> $docModifySerie,
+        "documento_que_se_modifica_numero"=> $docModifyNumber,
+        "tipo_de_nota_de_credito"=> $typeNoteCredit,
+        "tipo_de_nota_de_debito"=> $typeNoteDebit,
         "enviar_automaticamente_a_la_sunat"=> true,
         "enviar_automaticamente_al_cliente"=> false,
         "condiciones_de_pago"=> "",
@@ -118,9 +196,12 @@ class ApiInvoice extends Controller
     $response = \Http::withToken($token)->post($url, $responseParsed);
     if ($response->ok()){
         $responseJson = json_decode($response);
+        $responseTypeDocument="";
+        $responseCode="";
+        $responseNumber="";
         $result_response = array(
             "responseCode" => "0",
-            "responseContent" => "Operacion exitosa",
+            "responseContent" => $responseJson->sunat_description,
             "pseRequests" => []
         );
     } else {
@@ -140,9 +221,87 @@ class ApiInvoice extends Controller
     public function CancelInvoice(Request $request){
         try {
             $bodyResponseContent = json_decode(base64_decode($request->fileContent));
-            $serie_Number=explode('-', $bodyResponseContent->resumenComprobantes->DET[0]->numeracionItem);
+            \Log::info(base64_decode($request->fileContent));
             $typeDocument='';
-            switch ($bodyResponseContent->resumenComprobantes->DET[0]->tipoComprobanteItem) {
+            /** ANULAR FACTURA */
+            if (isset($bodyResponseContent->comunicacionBaja)){
+                switch ($bodyResponseContent->comunicacionBaja->DBR[0]->tipoComprobanteItem) {
+                    case '01':
+                        $typeDocument = 1;
+                    break;
+                    case '03':
+                        $typeDocument = 2;
+                    break;
+                    case '07':
+                        $typeDocument = 3;
+                    break;
+                    case '08':
+                        $typeDocument = 4;
+                    break;
+                }
+            $serie = $bodyResponseContent->comunicacionBaja->DBR[0]->serieItem;
+            $serieNumber = $bodyResponseContent->comunicacionBaja->DBR[0]->correlativoItem;
+            $observation = $bodyResponseContent->comunicacionBaja->DBR[0]->motivoBajaItem;
+            }
+            /** ANULAR BOLETA DE VENTA */
+            if (isset($bodyResponseContent->resumenComprobantes)){
+                switch ($bodyResponseContent->resumenComprobantes->DET[0]->tipoComprobanteItem) {
+                    case '01':
+                        $typeDocument = 1;
+                    break;
+                    case '03':
+                        $typeDocument = 2;
+                    break;
+                    case '07':
+                        $typeDocument = 3;
+                    break;
+                    case '08':
+                        $typeDocument = 4;
+                    break;
+                }
+            $serieExplode = explode('-', $bodyResponseContent->resumenComprobantes->DET[0]->numeracionItem); 
+            $serie = $serieExplode[0];
+            $serieNumber = $serieExplode[1];
+            $observation = "CANCELADO";
+            }
+            $arrayRequest = array(
+                "operacion" => "generar_anulacion",
+                "tipo_de_comprobante" => $typeDocument,
+                "serie" => $serie,
+                "numero" => $serieNumber,
+                "motivo"=> $observation,
+                "codigo_unico"=> "" 
+            );          
+            $url = NUBEFACT_URL;
+            $token = NUBEFACT_TOKEN;
+            $responseParsed = $arrayRequest;
+            $response = \Http::withToken($token)->post($url, $responseParsed );
+            if ($response->ok()){
+                $responseJson = json_decode($response);
+                $result_response = array(
+                    "responseCode" => 98,
+                    "responseContent" => "EN PROCESO",
+                    "ticket" => "",
+                    "pseRequests" => []
+                );
+            } else {
+                $responseJson = json_decode($response);
+                $result_response = array(
+                    "responseCode" => $responseJson->codigo,
+                    "responseContent" => $responseJson->errors,
+                    "ticket" => "",
+                    "pseRequests" => []
+                );
+            }
+        } catch (\Throwable $th) {
+        \Log::error($th);
+          return response()->json(['success' => false, 'message' => 'Estructura JSON inválida, consule el log'],500);
+        }
+        return response()->json($result_response, 200);
+    }
+    public function QueryInvoice(Request $request){
+        $typeDocument='';
+            switch ($request->codCPE) {
                 case '01':
                     $typeDocument = 1;
                 break;
@@ -156,32 +315,133 @@ class ApiInvoice extends Controller
                     $typeDocument = 4;
                 break;
             }
-        $serie_Number=explode('-', $bodyResponseContent->resumenComprobantes->DET[0]->numeracionItem);
+        try {
+            $serie= $request->numSerieCPE;
+            $serieNumber= (int)$request->numCPE;
             $arrayRequest = array(
-                "operacion" => "generar_anulacion",
+                "operacion" => "consultar_comprobante",
                 "tipo_de_comprobante" => $typeDocument,
-                "serie" => $serie_Number[0],
-                "numero" => $serie_Number[1],
-                "motivo"=> "ANULACION GENERICA",
-                "codigo_unico"=> "" 
-            );          
+                "serie" => $serie,
+                "numero" => $serieNumber,
+            );    
             $url = NUBEFACT_URL;
+                $token = NUBEFACT_TOKEN;
+                $responseParsed = $arrayRequest;
+                $response = \Http::withToken($token)->post($url, $responseParsed );
+                if ($response->ok()){
+                    $responseJson = json_decode($response);
+                    $result_response = array(
+                        "responseCode" => "0",
+                        "responseContent" => $responseJson,
+                        "pseRequests" => []
+                    );
+                } else {
+                    $responseJson = json_decode($response);
+                    $result_response = array(
+                        "responseCode" => $responseJson->codigo,
+                        "responseContent" => $responseJson->errors,
+                        "pseRequests" => []
+                    );
+                }
+            } catch (\Throwable $th) {
+            \Log::error($th);
+              return response()->json(['success' => false, 'message' => 'Estructura JSON inválida, consule el log'],500);
+            }
+            return response()->json($result_response, 200);  
+    }
+    public function QueryInvoiceXML(Request $request){
+        $typeDocument='';
+            switch ($request->codCPE) {
+                case '01':
+                    $typeDocument = 1;
+                break;
+                case '03':
+                    $typeDocument = 2;
+                break;
+                case '07':
+                    $typeDocument = 3;
+                break;
+                case '08':
+                    $typeDocument = 4;
+                break;
+            }
+        try {
+            $serie= $request->numSerieCPE;
+            $serieNumber= (int)$request->numCPE;
+            $arrayRequest = array(
+                "operacion" => "consultar_comprobante",
+                "tipo_de_comprobante" => $typeDocument,
+                "serie" => $serie,
+                "numero" => $serieNumber,
+            );    
+            $url = NUBEFACT_URL;
+                $token = NUBEFACT_TOKEN;
+                $responseParsed = $arrayRequest;
+                $response = \Http::withToken($token)->post($url, $responseParsed );
+                if ($response->ok()){
+                    $responseJson = json_decode($response);
+                    $result_response = array(
+                        "codigo" => 0 ,
+                        "mensaje" => "OK",
+                        "xml" => base64_encode(file_get_contents($responseJson->enlace_del_xml))
+                    );
+                } else {
+                    $responseJson = json_decode($response);
+                    $result_response = array(
+                        "codigo" => $responseJson->codigo,
+                        "mensaje" => $responseJson->errors,
+                        "xml" => ""
+                    );
+                }
+            } catch (\Throwable $th) {
+            \Log::error($th);
+              return response()->json(['success' => false, 'message' => 'Estructura JSON inválida, consule el log'],500);
+            }
+            return response()->json($result_response, 200);  
+    }
+    public function QueryInvoiceQR(Request $request){
+        $typeDocument='';
+        switch ($request->codCPE) {
+            case '01':
+                $typeDocument = 1;
+            break;
+            case '03':
+                $typeDocument = 2;
+            break;
+            case '07':
+                $typeDocument = 3;
+            break;
+            case '08':
+                $typeDocument = 4;
+            break;
+        }
+    try {
+        $serie= $request->numSerieCPE;
+        $serieNumber= (int)$request->numCPE;
+        $arrayRequest = array(
+            "operacion" => "consultar_comprobante",
+            "tipo_de_comprobante" => $typeDocument,
+            "serie" => $serie,
+            "numero" => $serieNumber,
+        );    
+        $url = NUBEFACT_URL;
             $token = NUBEFACT_TOKEN;
             $responseParsed = $arrayRequest;
             $response = \Http::withToken($token)->post($url, $responseParsed );
             if ($response->ok()){
                 $responseJson = json_decode($response);
+                $codigoQR = QrCode::format('png')->size(300)->margin(6)->generate($responseJson->enlace_del_xml);
                 $result_response = array(
-                    "responseCode" => "0",
-                    "responseContent" => "Operacion exitosa",
-                    "pseRequests" => []
+                    "codigo" => 0 ,
+                    "mensaje" => "OK",
+                    "pdfQRCode" => base64_encode($codigoQR)
                 );
             } else {
                 $responseJson = json_decode($response);
                 $result_response = array(
-                    "responseCode" => $responseJson->codigo,
-                    "responseContent" => $responseJson->errors,
-                    "pseRequests" => []
+                    "codigo" => $responseJson->codigo,
+                    "mensaje" => $responseJson->errors,
+                    "pdfQRCode" => ""
                 );
             }
         } catch (\Throwable $th) {
@@ -189,31 +449,5 @@ class ApiInvoice extends Controller
           return response()->json(['success' => false, 'message' => 'Estructura JSON inválida, consule el log'],500);
         }
         return response()->json($result_response, 200);
-    }
-    // public function QueryInvoice(Request $Request){
-    //     $arrayRequest = array(
-    //         "operacion" => "consultar_comprobante",
-    //         "tipo_de_comprobante" => 1,
-    //         "serie" => "F050",
-    //         "numero" => 1,
-    //     );    
-    //     $url = NUBEFACT_URL;
-    //     $token = NUBEFACT_TOKEN;
-    //     $responseParsed = $arrayRequest;
-    //     $response = \Http::withToken($token)->post($url, $responseParsed );
-    //     if ($response->ok()){
-    //         $responseJson = json_decode($response);
-    //     } else {
-    //         $responseJson = json_decode($response);
-    //     }
-    //     return response()->json(['respuesta' => $responseJson], 200);
-    // }
-    public function QueryInvoiceXML(Request $Request){
-
-    }
-    public function QueryInvoiceQR(Request $Request){
-
-
-    return response()->json($result_response, 200);
     }
 }
