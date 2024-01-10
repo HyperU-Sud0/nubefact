@@ -10,8 +10,9 @@ class ApiInvoice extends Controller
 {
     public function index(Request $request){
         try {
+            //\Log::info($request);
             $bodyResponseContent = json_decode(base64_decode($request->fileContent));
-            \Log::info(base64_decode($request->fileContent));
+            \Log::info(json_encode($bodyResponseContent));
             $typeNoteCredit = "";
             $typeNoteDebit = "";
             $docModifyId = "";
@@ -20,31 +21,45 @@ class ApiInvoice extends Controller
             /** EMISION DE FACTURA */
            if (isset($bodyResponseContent->factura)){
             $requestCodTypeDocument = "01";
-            $requestSerie = $bodyResponseContent->factura->IDE->numeracion;
-            $requestDateEmition = $bodyResponseContent->factura->IDE->fechaEmision;
-            $requestDocType = $bodyResponseContent->factura->EMI->tipoDocId;
-            $requestDocNumber = $bodyResponseContent->factura->EMI->numeroDocId;
-            $requestCustomerName = $bodyResponseContent->factura->EMI->razonSocial;
-            $requestCustomerAddress= $bodyResponseContent->factura->EMI->direccion;
-            $requestGravada = $bodyResponseContent->factura->CAB->gravadas->totalVentas;
-            $requestTotalIgv =$bodyResponseContent->factura->CAB->totalImpuestos[0]->montoImpuesto;
-            $requestTotal =$bodyResponseContent->factura->CAB->importeTotal;
-            $requestItemsCount = $bodyResponseContent->factura->DET;
+            $requestSerie = $bodyResponseContent->factura->IDE->numeracion ?? "";
+            $requestDateEmition = $bodyResponseContent->factura->IDE->fechaEmision ?? "";
+            $requestDocType = $bodyResponseContent->factura->REC->tipoDocId ?? "";
+            $requestDocNumber = $bodyResponseContent->factura->REC->numeroDocId ?? "";
+            $requestCustomerName = $bodyResponseContent->factura->REC->razonSocial ?? "";
+            $requestCustomerAddress= $bodyResponseContent->factura->REC->direccion ?? "";
+            $requestGravada = $bodyResponseContent->factura->CAB->gravadas->totalVentas ?? "";
+            $requestTotalIgv =$bodyResponseContent->factura->CAB->totalImpuestos[0]->montoImpuesto ?? "";
+            $requestTotal =$bodyResponseContent->factura->CAB->importeTotal ?? "";
+            $requestItemsCount = $bodyResponseContent->factura->DET ?? "";
+           }
+           /** EMISION DE BOLETA */
+           if (isset($bodyResponseContent->boleta)){
+            $requestCodTypeDocument = "03";
+            $requestSerie = $bodyResponseContent->boleta->IDE->numeracion ?? "";
+            $requestDateEmition = $bodyResponseContent->boleta->IDE->fechaEmision ?? "";
+            $requestDocType = $bodyResponseContent->boleta->REC->tipoDocId ?? "";
+            $requestDocNumber = $bodyResponseContent->boleta->REC->numeroDocId ?? "";
+            $requestCustomerName = $bodyResponseContent->boleta->REC->razonSocial ?? "";
+            $requestCustomerAddress= $bodyResponseContent->boleta->REC->direccion ?? "";
+            $requestGravada = $bodyResponseContent->boleta->CAB->gravadas->totalVentas ?? "";
+            $requestTotalIgv =$bodyResponseContent->boleta->CAB->totalImpuestos[0]->montoImpuesto ?? "";
+            $requestTotal =$bodyResponseContent->boleta->CAB->importeTotal ?? "";
+            $requestItemsCount = $bodyResponseContent->boleta->DET ?? "";
            }
            /** EMISION DE NOTA DE CREDITO */
            if (isset($bodyResponseContent->notaCredito)){
-            $requestCodTypeDocument = "7";
-            $requestSerie = $bodyResponseContent->notaCredito->IDE->numeracion;
-            $requestDateEmition = $bodyResponseContent->notaCredito->IDE->fechaEmision;
-            $requestDocType = $bodyResponseContent->notaCredito->EMI->tipoDocId;
-            $requestDocNumber = $bodyResponseContent->notaCredito->EMI->numeroDocId;
-            $requestCustomerName = $bodyResponseContent->notaCredito->EMI->razonSocial;
-            $requestCustomerAddress= $bodyResponseContent->notaCredito->EMI->direccion;
-            $requestGravada = $bodyResponseContent->notaCredito->CAB->gravadas->totalVentas;
-            $requestTotalIgv =$bodyResponseContent->notaCredito->CAB->totalImpuestos[0]->montoImpuesto;
-            $requestTotal =$bodyResponseContent->notaCredito->CAB->importeTotal;
-            $requestItemsCount = $bodyResponseContent->notaCredito->DET;
-            $typeNoteCredit = (int)$bodyResponseContent->notaCredito->DRF[0]->codigoMotivo;
+            $requestCodTypeDocument = "07";
+            $requestSerie = $bodyResponseContent->notaCredito->IDE->numeracion ?? "";
+            $requestDateEmition = $bodyResponseContent->notaCredito->IDE->fechaEmision ?? "";
+            $requestDocType = $bodyResponseContent->notaCredito->REC->tipoDocId ?? "";
+            $requestDocNumber = $bodyResponseContent->notaCredito->REC->numeroDocId ?? "";
+            $requestCustomerName = $bodyResponseContent->notaCredito->REC->razonSocial ?? "";
+            $requestCustomerAddress= $bodyResponseContent->notaCredito->REC->direccion ?? "";
+            $requestGravada = $bodyResponseContent->notaCredito->CAB->gravadas->totalVentas ?? "";
+            $requestTotalIgv =$bodyResponseContent->notaCredito->CAB->totalImpuestos[0]->montoImpuesto ?? "";
+            $requestTotal =$bodyResponseContent->notaCredito->CAB->importeTotal ?? "";
+            $requestItemsCount = $bodyResponseContent->notaCredito->DET ?? "";
+            $typeNoteCredit = (int)$bodyResponseContent->notaCredito->DRF[0]->codigoMotivo ?? "";
             if (isset($bodyResponseContent->notaCredito->DRF[0]->tipoDocRelacionado)){
                 switch ($bodyResponseContent->notaCredito->DRF[0]->tipoDocRelacionado) {
                 case '01':
@@ -63,18 +78,18 @@ class ApiInvoice extends Controller
            } 
             /** EMISION DE NOTA DE DEBITO */
             if (isset($bodyResponseContent->notaDebito)){
-                $requestCodTypeDocument = "8";
-                $requestSerie = $bodyResponseContent->notaDebito->IDE->numeracion;
-                $requestDateEmition = $bodyResponseContent->notaDebito->IDE->fechaEmision;
-                $requestDocType = $bodyResponseContent->notaDebito->EMI->tipoDocId;
-                $requestDocNumber = $bodyResponseContent->notaDebito->EMI->numeroDocId;
-                $requestCustomerName = $bodyResponseContent->notaDebito->EMI->razonSocial;
-                $requestCustomerAddress= $bodyResponseContent->notaDebito->EMI->direccion;
-                $requestGravada = $bodyResponseContent->notaDebito->CAB->gravadas->totalVentas;
-                $requestTotalIgv =$bodyResponseContent->notaDebito->CAB->totalImpuestos[0]->montoImpuesto;
-                $requestTotal =$bodyResponseContent->notaDebito->CAB->importeTotal;
-                $requestItemsCount = $bodyResponseContent->notaDebito->DET;
-                $typeNoteDebit = (int)$bodyResponseContent->notaDebito->DRF[0]->codigoMotivo;
+                $requestCodTypeDocument = "08";
+                $requestSerie = $bodyResponseContent->notaDebito->IDE->numeracion ?? "";
+                $requestDateEmition = $bodyResponseContent->notaDebito->IDE->fechaEmision ?? "";
+                $requestDocType = $bodyResponseContent->notaDebito->REC->tipoDocId ?? "";
+                $requestDocNumber = $bodyResponseContent->notaDebito->REC->numeroDocId ?? "";
+                $requestCustomerName = $bodyResponseContent->notaDebito->REC->razonSocial ?? "";
+                $requestCustomerAddress= $bodyResponseContent->notaDebito->REC->direccion ?? "";
+                $requestGravada = $bodyResponseContent->notaDebito->CAB->gravadas->totalVentas ?? "";
+                $requestTotalIgv =$bodyResponseContent->notaDebito->CAB->totalImpuestos[0]->montoImpuesto ?? "";
+                $requestTotal =$bodyResponseContent->notaDebito->CAB->importeTotal ?? "";
+                $requestItemsCount = $bodyResponseContent->notaDebito->DET ?? "";
+                $typeNoteDebit = (int)$bodyResponseContent->notaDebito->DRF[0]->codigoMotivo ?? "";
                 if (isset($bodyResponseContent->notaDebito->DRF[0]->tipoDocRelacionado)){
                     switch ($bodyResponseContent->notaDebito->DRF[0]->tipoDocRelacionado) {
                     case '01':
@@ -214,16 +229,21 @@ class ApiInvoice extends Controller
     }
         } catch (\Throwable $th) {
             \Log::error($th);
-            return response()->json(['success' => false, 'message' => 'Estructura JSON inválida, consule el log'],500);
+            $result_response = array(
+                "responseCode" => 99,
+                "responseContent" => "Estructura JSON inválida, consule el log",
+                "pseRequests" => []
+            );
+            return response()->json($result_response,200);
             }
     return response()->json($result_response, 200);
     }
     public function CancelInvoice(Request $request){
         try {
             $bodyResponseContent = json_decode(base64_decode($request->fileContent));
-            \Log::info(base64_decode($request->fileContent));
             $typeDocument='';
-            /** ANULAR FACTURA */
+            \Log::info(base64_decode($request->fileContent));
+            /** ANULAR FACTURA, NOTA DE CREDITO, NOTA DE DEBITO */
             if (isset($bodyResponseContent->comunicacionBaja)){
                 switch ($bodyResponseContent->comunicacionBaja->DBR[0]->tipoComprobanteItem) {
                     case '01':
@@ -239,29 +259,16 @@ class ApiInvoice extends Controller
                         $typeDocument = 4;
                     break;
                 }
-            $serie = $bodyResponseContent->comunicacionBaja->DBR[0]->serieItem;
-            $serieNumber = $bodyResponseContent->comunicacionBaja->DBR[0]->correlativoItem;
-            $observation = $bodyResponseContent->comunicacionBaja->DBR[0]->motivoBajaItem;
+            $serie = $bodyResponseContent->comunicacionBaja->DBR[0]->serieItem ?? "";
+            $serieNumber = $bodyResponseContent->comunicacionBaja->DBR[0]->correlativoItem ?? "";
+            $observation = $bodyResponseContent->comunicacionBaja->DBR[0]->motivoBajaItem ?? "";
             }
             /** ANULAR BOLETA DE VENTA */
             if (isset($bodyResponseContent->resumenComprobantes)){
-                switch ($bodyResponseContent->resumenComprobantes->DET[0]->tipoComprobanteItem) {
-                    case '01':
-                        $typeDocument = 1;
-                    break;
-                    case '03':
-                        $typeDocument = 2;
-                    break;
-                    case '07':
-                        $typeDocument = 3;
-                    break;
-                    case '08':
-                        $typeDocument = 4;
-                    break;
-                }
+            $typeDocument = 2;
             $serieExplode = explode('-', $bodyResponseContent->resumenComprobantes->DET[0]->numeracionItem); 
             $serie = $serieExplode[0];
-            $serieNumber = $serieExplode[1];
+            $serieNumber = (int)$serieExplode[1];
             $observation = "CANCELADO";
             }
             $arrayRequest = array(
@@ -279,9 +286,9 @@ class ApiInvoice extends Controller
             if ($response->ok()){
                 $responseJson = json_decode($response);
                 $result_response = array(
-                    "responseCode" => 98,
+                    "responseCode" => "98",
                     "responseContent" => "EN PROCESO",
-                    "ticket" => "",
+                    "ticket" => (string)$responseJson->sunat_ticket_numero,
                     "pseRequests" => []
                 );
             } else {
@@ -295,11 +302,17 @@ class ApiInvoice extends Controller
             }
         } catch (\Throwable $th) {
         \Log::error($th);
-          return response()->json(['success' => false, 'message' => 'Estructura JSON inválida, consule el log'],500);
+        $result_response = array(
+            "responseCode" => 99,
+            "responseContent" => "Estructura JSON inválida, consule el log",
+            "pseRequests" => []
+        );
+        return response()->json($result_response,200);
         }
         return response()->json($result_response, 200);
     }
     public function QueryInvoice(Request $request){
+        \Log::info($request->all());
         $typeDocument='';
             switch ($request->codCPE) {
                 case '01':
@@ -319,7 +332,7 @@ class ApiInvoice extends Controller
             $serie= $request->numSerieCPE;
             $serieNumber= (int)$request->numCPE;
             $arrayRequest = array(
-                "operacion" => "consultar_comprobante",
+                "operacion" => "consultar_anulacion",
                 "tipo_de_comprobante" => $typeDocument,
                 "serie" => $serie,
                 "numero" => $serieNumber,
@@ -331,21 +344,32 @@ class ApiInvoice extends Controller
                 if ($response->ok()){
                     $responseJson = json_decode($response);
                     $result_response = array(
+                        "codigo" => "0",
+                        "mensaje" => "OK",
+                        "statusCode" => "0",
                         "responseCode" => "0",
-                        "responseContent" => $responseJson,
-                        "pseRequests" => []
+                        "responseMessage" => $responseJson->sunat_description,
+                        "contentFile" => base64_encode(file_get_contents($responseJson->enlace_del_xml))
                     );
                 } else {
                     $responseJson = json_decode($response);
                     $result_response = array(
+                        "codigo" => $responseJson->codigo,
+                        "mensaje" => "ERROR",
+                        "statusCode" => $responseJson->codigo,
                         "responseCode" => $responseJson->codigo,
-                        "responseContent" => $responseJson->errors,
-                        "pseRequests" => []
+                        "responseMessage" => $responseJson->errors,
+                        "contentFile" => ""
                     );
                 }
             } catch (\Throwable $th) {
             \Log::error($th);
-              return response()->json(['success' => false, 'message' => 'Estructura JSON inválida, consule el log'],500);
+            $result_response = array(
+                "responseCode" => 99,
+                "responseContent" => "Estructura JSON inválida, consule el log",
+                "pseRequests" => []
+            );
+            return response()->json($result_response,200);
             }
             return response()->json($result_response, 200);  
     }
@@ -430,23 +454,151 @@ class ApiInvoice extends Controller
             $response = \Http::withToken($token)->post($url, $responseParsed );
             if ($response->ok()){
                 $responseJson = json_decode($response);
-                $codigoQR = QrCode::format('png')->size(300)->margin(6)->generate($responseJson->enlace_del_xml);
+                $codigoQR = QrCode::format('png')->size(300)->margin(6)->generate($responseJson->cadena_para_codigo_qr);
                 $result_response = array(
-                    "codigo" => 0 ,
+                    "codigo" => "0",
                     "mensaje" => "OK",
                     "pdfQRCode" => base64_encode($codigoQR)
                 );
             } else {
                 $responseJson = json_decode($response);
                 $result_response = array(
-                    "codigo" => $responseJson->codigo,
+                    "codigo" => (string)$responseJson->codigo,
                     "mensaje" => $responseJson->errors,
                     "pdfQRCode" => ""
                 );
             }
         } catch (\Throwable $th) {
         \Log::error($th);
-          return response()->json(['success' => false, 'message' => 'Estructura JSON inválida, consule el log'],500);
+        $result_response = array(
+            "responseCode" => 99,
+            "responseContent" => "Estructura JSON inválida, consule el log",
+            "pseRequests" => []
+        );
+        return response()->json($result_response,200);
+        }
+        return response()->json($result_response, 200);
+    }
+
+    public function QueryInvoiceSandbox(Request $request){
+        \Log::info($request->all());
+        $typeDocument='';
+            switch ($request->codCPE) {
+                case '01':
+                    $typeDocument = 1;
+                break;
+                case '03':
+                    $typeDocument = 2;
+                break;
+                case '07':
+                    $typeDocument = 3;
+                break;
+                case '08':
+                    $typeDocument = 4;
+                break;
+            }
+        try {
+            $serie= $request->numSerieCPE;
+            $serieNumber= (int)$request->numCPE;
+            $arrayRequest = array(
+                "operacion" => "consultar_comprobante",
+                "tipo_de_comprobante" => $typeDocument,
+                "serie" => $serie,
+                "numero" => $serieNumber,
+            );    
+            $url = NUBEFACT_URL;
+                $token = NUBEFACT_TOKEN;
+                $responseParsed = $arrayRequest;
+                $response = \Http::withToken($token)->post($url, $responseParsed );
+                if ($response->ok()){
+                    $responseJson = json_decode($response);
+                    $result_response = array(
+                        "mensaje" => "OK",
+                        "statusCode" => 0,
+                        "responseCode" => 0,
+                        "responseMessage" => "",
+                        "contentFile" => $responseJson
+                    );
+                } else {
+                    $responseJson = json_decode($response);
+                    $result_response = array(
+                        "mensaje" => "ERROR",
+                        "statusCode" => $responseJson->codigo,
+                        "responseCode" => $responseJson->codigo,
+                        "responseMessage" => $responseJson->errors,
+                        "contentFile" => ""
+                    );
+                }
+            } catch (\Throwable $th) {
+            \Log::error($th);
+            $result_response = array(
+                "responseCode" => 99,
+                "responseContent" => "Estructura JSON inválida, consule el log",
+                "pseRequests" => []
+            );
+            return response()->json($result_response,200);
+            }
+            return response()->json($result_response, 200);  
+    }
+    public function CancelInvoiceSandbox(Request $request){
+        try {
+            \Log::info($request->all());
+            $typeDocument='';
+                switch ($request->codCPE) {
+                    case '01':
+                        $typeDocument = 1;
+                    break;
+                    case '03':
+                        $typeDocument = 2;
+                    break;
+                    case '07':
+                        $typeDocument = 3;
+                    break;
+                    case '08':
+                        $typeDocument = 4;
+                    break;
+                }
+            $serie = $request->numSerieCPE ?? "";
+            $serieNumber = (int)$request->numCPE;
+            $observation = $request->observation;
+            
+            $arrayRequest = array(
+                "operacion" => "generar_anulacion",
+                "tipo_de_comprobante" => $typeDocument,
+                "serie" => $serie,
+                "numero" => $serieNumber,
+                "motivo"=> $observation,
+                "codigo_unico"=> "" 
+            );          
+            $url = NUBEFACT_URL;
+            $token = NUBEFACT_TOKEN;
+            $responseParsed = $arrayRequest;
+            $response = \Http::withToken($token)->post($url, $responseParsed );
+            if ($response->ok()){
+                $responseJson = json_decode($response);
+                $result_response = array(
+                    "responseCode" => "98",
+                    "responseContent" => "EN PROCESO",
+                    "ticket" => $responseJson,
+                    "pseRequests" => []
+                );
+            } else {
+                $responseJson = json_decode($response);
+                $result_response = array(
+                    "responseCode" => $responseJson->codigo,
+                    "responseContent" => $responseJson->errors,
+                    "ticket" => "",
+                    "pseRequests" => []
+                );
+            }
+        } catch (\Throwable $th) {
+        \Log::error($th);
+        $result_response = array(
+            "responseCode" => 99,
+            "responseContent" => "Estructura JSON inválida, consule el log",
+            "pseRequests" => []
+        );
+        return response()->json($result_response,200);
         }
         return response()->json($result_response, 200);
     }
