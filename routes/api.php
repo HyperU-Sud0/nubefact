@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Route;
  */
 Route::post('sandbox',[\App\Http\Controllers\ApiInvoice::class, 'QueryInvoiceSandbox'])->name('sandbox');
 Route::post('cancel_sandbox',[\App\Http\Controllers\ApiInvoice::class, 'CancelInvoiceSandbox'])->name('cancel_sandbox');
+Route::post('cancel_sandbox_query',[\App\Http\Controllers\ApiInvoice::class, 'CancelInvoiceQuerySandbox'])->name('cancel_sandbox_query');
+
 /**
  * FIN SANDBOX
  */

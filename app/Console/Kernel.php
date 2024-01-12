@@ -15,7 +15,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('sendervoucher:daily')
+        ->timezone('America/Lima')
+        ->dailyAt('8:00')
+        //->everyMinute()
+        ->runInBackground()
+        ->withoutOverlapping(10);
     }
 
     /**

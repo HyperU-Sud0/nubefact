@@ -12,7 +12,7 @@ class ApiInvoice extends Controller
         try {
             //\Log::info($request);
             $bodyResponseContent = json_decode(base64_decode($request->fileContent));
-            \Log::info(json_encode($bodyResponseContent));
+            //\Log::info(json_encode($bodyResponseContent));
             $typeNoteCredit = "";
             $typeNoteDebit = "";
             $docModifyId = "";
@@ -242,7 +242,7 @@ class ApiInvoice extends Controller
         try {
             $bodyResponseContent = json_decode(base64_decode($request->fileContent));
             $typeDocument='';
-            \Log::info(base64_decode($request->fileContent));
+            //\Log::info(base64_decode($request->fileContent));
             /** ANULAR FACTURA, NOTA DE CREDITO, NOTA DE DEBITO */
             if (isset($bodyResponseContent->comunicacionBaja)){
                 switch ($bodyResponseContent->comunicacionBaja->DBR[0]->tipoComprobanteItem) {
@@ -293,12 +293,27 @@ class ApiInvoice extends Controller
                 );
             } else {
                 $responseJson = json_decode($response);
-                $result_response = array(
-                    "responseCode" => $responseJson->codigo,
-                    "responseContent" => $responseJson->errors,
-                    "ticket" => "",
-                    "pseRequests" => []
-                );
+                if (isset($bodyResponseContent->resumenComprobantes) && $responseJson->codigo == 21){
+                    $setInvoice = new \App\Models\ScheduleVoucher;
+                    $setInvoice->updateOrCreate(
+                        ['serie' => $serie, 'number' => $serieNumber],
+                        ['serie' => $serie, 'number' => $serieNumber]
+                    );
+                    $result_response = array(
+                        "responseCode" => $responseJson->codigo,
+                        "responseContent" => "EN PROCESO",
+                        "ticket" => "",
+                        "pseRequests" => []
+                    );
+                } else {
+                    $result_response = array(
+                        "responseCode" => $responseJson->codigo,
+                        "responseContent" => $responseJson->errors,
+                        "ticket" => "",
+                        "pseRequests" => []
+                    );
+                }
+                
             }
         } catch (\Throwable $th) {
         \Log::error($th);
@@ -312,7 +327,7 @@ class ApiInvoice extends Controller
         return response()->json($result_response, 200);
     }
     public function QueryInvoice(Request $request){
-        \Log::info($request->all());
+        //\Log::info($request->all());
         $typeDocument='';
             switch ($request->codCPE) {
                 case '01':
@@ -353,14 +368,17 @@ class ApiInvoice extends Controller
                     );
                 } else {
                     $responseJson = json_decode($response);
-                    $result_response = array(
-                        "codigo" => $responseJson->codigo,
-                        "mensaje" => "ERROR",
-                        "statusCode" => $responseJson->codigo,
-                        "responseCode" => $responseJson->codigo,
-                        "responseMessage" => $responseJson->errors,
-                        "contentFile" => ""
-                    );
+                     if ($typeDocument == 2 && $responseJson->codigo == 40){
+                        $result_response = array(
+                            "codigo" => -1,
+                            "mensaje" => "EN PROCESO"
+                        );
+                     } else {
+                        $result_response = array(
+                            "codigo" => -1,
+                            "mensaje" => $responseJson->errors
+                        );
+                     } 
                 }
             } catch (\Throwable $th) {
             \Log::error($th);
@@ -502,6 +520,66 @@ class ApiInvoice extends Controller
             $serieNumber= (int)$request->numCPE;
             $arrayRequest = array(
                 "operacion" => "consultar_comprobante",
+                "tipo_de_comprobante" => $typeDocument,
+                "serie" => $serie,
+                "numero" => $serieNumber,
+            );    
+            $url = NUBEFACT_URL;
+                $token = NUBEFACT_TOKEN;
+                $responseParsed = $arrayRequest;
+                $response = \Http::withToken($token)->post($url, $responseParsed );
+                if ($response->ok()){
+                    $responseJson = json_decode($response);
+                    $result_response = array(
+                        "mensaje" => "OK",
+                        "statusCode" => 0,
+                        "responseCode" => 0,
+                        "responseMessage" => "",
+                        "contentFile" => $responseJson
+                    );
+                } else {
+                    $responseJson = json_decode($response);
+                    $result_response = array(
+                        "mensaje" => "ERROR",
+                        "statusCode" => $responseJson->codigo,
+                        "responseCode" => $responseJson->codigo,
+                        "responseMessage" => $responseJson->errors,
+                        "contentFile" => ""
+                    );
+                }
+            } catch (\Throwable $th) {
+            \Log::error($th);
+            $result_response = array(
+                "responseCode" => 99,
+                "responseContent" => "Estructura JSON inválida, consule el log",
+                "pseRequests" => []
+            );
+            return response()->json($result_response,200);
+            }
+            return response()->json($result_response, 200);  
+    }
+    public function CancelInvoiceQuerySandbox(Request $request){
+        \Log::info($request->all());
+        $typeDocument='';
+            switch ($request->codCPE) {
+                case '01':
+                    $typeDocument = 1;
+                break;
+                case '03':
+                    $typeDocument = 2;
+                break;
+                case '07':
+                    $typeDocument = 3;
+                break;
+                case '08':
+                    $typeDocument = 4;
+                break;
+            }
+        try {
+            $serie= $request->numSerieCPE;
+            $serieNumber= (int)$request->numCPE;
+            $arrayRequest = array(
+                "operacion" => "consultar_anulacion",
                 "tipo_de_comprobante" => $typeDocument,
                 "serie" => $serie,
                 "numero" => $serieNumber,
