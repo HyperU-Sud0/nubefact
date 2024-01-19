@@ -10,14 +10,13 @@ class ApiInvoice extends Controller
 {
     public function index(Request $request){
         try {
-            //\Log::info($request);
             $bodyResponseContent = json_decode(base64_decode($request->fileContent));
-            //\Log::info(json_encode($bodyResponseContent));
             $typeNoteCredit = "";
             $typeNoteDebit = "";
             $docModifyId = "";
             $docModifySerie = "";
             $docModifyNumber = "";
+            $ruc = null;
             /** EMISION DE FACTURA */
            if (isset($bodyResponseContent->factura)){
             $requestCodTypeDocument = "01";
@@ -31,6 +30,7 @@ class ApiInvoice extends Controller
             $requestTotalIgv =$bodyResponseContent->factura->CAB->totalImpuestos[0]->montoImpuesto ?? "";
             $requestTotal =$bodyResponseContent->factura->CAB->importeTotal ?? "";
             $requestItemsCount = $bodyResponseContent->factura->DET ?? "";
+            $ruc = $bodyResponseContent->factura->EMI->numeroDocId ?? null;
            }
            /** EMISION DE BOLETA */
            if (isset($bodyResponseContent->boleta)){
@@ -45,6 +45,7 @@ class ApiInvoice extends Controller
             $requestTotalIgv =$bodyResponseContent->boleta->CAB->totalImpuestos[0]->montoImpuesto ?? "";
             $requestTotal =$bodyResponseContent->boleta->CAB->importeTotal ?? "";
             $requestItemsCount = $bodyResponseContent->boleta->DET ?? "";
+            $ruc = $bodyResponseContent->boleta->EMI->numeroDocId ?? null;
            }
            /** EMISION DE NOTA DE CREDITO */
            if (isset($bodyResponseContent->notaCredito)){
@@ -60,6 +61,7 @@ class ApiInvoice extends Controller
             $requestTotal =$bodyResponseContent->notaCredito->CAB->importeTotal ?? "";
             $requestItemsCount = $bodyResponseContent->notaCredito->DET ?? "";
             $typeNoteCredit = (int)$bodyResponseContent->notaCredito->DRF[0]->codigoMotivo ?? "";
+            $ruc = $bodyResponseContent->notaCredito->EMI->numeroDocId ?? null;
             if (isset($bodyResponseContent->notaCredito->DRF[0]->tipoDocRelacionado)){
                 switch ($bodyResponseContent->notaCredito->DRF[0]->tipoDocRelacionado) {
                 case '01':
@@ -90,6 +92,7 @@ class ApiInvoice extends Controller
                 $requestTotal =$bodyResponseContent->notaDebito->CAB->importeTotal ?? "";
                 $requestItemsCount = $bodyResponseContent->notaDebito->DET ?? "";
                 $typeNoteDebit = (int)$bodyResponseContent->notaDebito->DRF[0]->codigoMotivo ?? "";
+                $ruc = $bodyResponseContent->notaDebito->EMI->numeroDocId ?? null;
                 if (isset($bodyResponseContent->notaDebito->DRF[0]->tipoDocRelacionado)){
                     switch ($bodyResponseContent->notaDebito->DRF[0]->tipoDocRelacionado) {
                     case '01':
@@ -205,8 +208,11 @@ class ApiInvoice extends Controller
         "servicios_region_selva"=> "",
         "items" =>$items
     );
-    $url = NUBEFACT_URL;
-    $token = NUBEFACT_TOKEN;
+    if (is_null($ruc)){
+        $ruc = "20601285101";
+    }
+    $url = NUBEFACT_ARRAY_URL[$ruc] ?? NUBEFACT_URL;
+    $token = NUBEFACT_ARRAY_TOKEN[$ruc] ?? NUBEFACT_TOKEN;
     $responseParsed = $arrayRequest;
     $response = \Http::withToken($token)->post($url, $responseParsed);
     if ($response->ok()){
@@ -242,7 +248,7 @@ class ApiInvoice extends Controller
         try {
             $bodyResponseContent = json_decode(base64_decode($request->fileContent));
             $typeDocument='';
-            //\Log::info(base64_decode($request->fileContent));
+            $ruc = null;
             /** ANULAR FACTURA, NOTA DE CREDITO, NOTA DE DEBITO */
             if (isset($bodyResponseContent->comunicacionBaja)){
                 switch ($bodyResponseContent->comunicacionBaja->DBR[0]->tipoComprobanteItem) {
@@ -262,6 +268,7 @@ class ApiInvoice extends Controller
             $serie = $bodyResponseContent->comunicacionBaja->DBR[0]->serieItem ?? "";
             $serieNumber = $bodyResponseContent->comunicacionBaja->DBR[0]->correlativoItem ?? "";
             $observation = $bodyResponseContent->comunicacionBaja->DBR[0]->motivoBajaItem ?? "";
+            $ruc = $bodyResponseContent->comunicacionBaja->EMI->numeroDocId ?? null;
             }
             /** ANULAR BOLETA DE VENTA */
             if (isset($bodyResponseContent->resumenComprobantes)){
@@ -270,6 +277,7 @@ class ApiInvoice extends Controller
             $serie = $serieExplode[0];
             $serieNumber = (int)$serieExplode[1];
             $observation = "CANCELADO";
+            $ruc = $bodyResponseContent->resumenComprobantes->EMI->numeroDocId ?? null;
             }
             $arrayRequest = array(
                 "operacion" => "generar_anulacion",
@@ -278,9 +286,12 @@ class ApiInvoice extends Controller
                 "numero" => $serieNumber,
                 "motivo"=> $observation,
                 "codigo_unico"=> "" 
-            );          
-            $url = NUBEFACT_URL;
-            $token = NUBEFACT_TOKEN;
+            );   
+            if (is_null($ruc)){
+                $ruc = "20601285101";
+            }       
+            $url = NUBEFACT_ARRAY_URL[$ruc] ?? NUBEFACT_URL;
+            $token = NUBEFACT_ARRAY_TOKEN[$ruc] ?? NUBEFACT_TOKEN;
             $responseParsed = $arrayRequest;
             $response = \Http::withToken($token)->post($url, $responseParsed );
             if ($response->ok()){
@@ -296,8 +307,8 @@ class ApiInvoice extends Controller
                 if (isset($bodyResponseContent->resumenComprobantes) && $responseJson->codigo == 21){
                     $setInvoice = new \App\Models\ScheduleVoucher;
                     $setInvoice->updateOrCreate(
-                        ['serie' => $serie, 'number' => $serieNumber],
-                        ['serie' => $serie, 'number' => $serieNumber]
+                        ['serie' => $serie, 'number' => $serieNumber, 'docnumber' => $ruc],
+                        ['serie' => $serie, 'number' => $serieNumber, 'docnumber' => $ruc]
                     );
                     $result_response = array(
                         "responseCode" => $responseJson->codigo,
@@ -313,7 +324,7 @@ class ApiInvoice extends Controller
                         "pseRequests" => []
                     );
                 }
-                
+                \Log::info(print_r($responseJson, false));
             }
         } catch (\Throwable $th) {
         \Log::error($th);
@@ -327,33 +338,23 @@ class ApiInvoice extends Controller
         return response()->json($result_response, 200);
     }
     public function QueryInvoice(Request $request){
-        //\Log::info($request->all());
-        $typeDocument='';
-            switch ($request->codCPE) {
-                case '01':
-                    $typeDocument = 1;
-                break;
-                case '03':
-                    $typeDocument = 2;
-                break;
-                case '07':
-                    $typeDocument = 3;
-                break;
-                case '08':
-                    $typeDocument = 4;
-                break;
-            }
+        $ruc = null;
+        $typeDocument=$request->codCPE;
         try {
             $serie= $request->numSerieCPE;
             $serieNumber= (int)$request->numCPE;
+            $ruc=$request->numDoc ?? null;
             $arrayRequest = array(
                 "operacion" => "consultar_anulacion",
                 "tipo_de_comprobante" => $typeDocument,
                 "serie" => $serie,
                 "numero" => $serieNumber,
             );    
-            $url = NUBEFACT_URL;
-                $token = NUBEFACT_TOKEN;
+            if (is_null($ruc)){
+                $ruc = "20601285101";
+            }
+            $url = NUBEFACT_ARRAY_URL[$ruc] ?? NUBEFACT_URL;
+            $token = NUBEFACT_ARRAY_TOKEN[$ruc] ?? NUBEFACT_TOKEN;
                 $responseParsed = $arrayRequest;
                 $response = \Http::withToken($token)->post($url, $responseParsed );
                 if ($response->ok()){
@@ -392,6 +393,7 @@ class ApiInvoice extends Controller
             return response()->json($result_response, 200);  
     }
     public function QueryInvoiceXML(Request $request){
+        $ruc = null;
         $typeDocument='';
             switch ($request->codCPE) {
                 case '01':
@@ -410,14 +412,18 @@ class ApiInvoice extends Controller
         try {
             $serie= $request->numSerieCPE;
             $serieNumber= (int)$request->numCPE;
+            $ruc=$request->numDoc ?? null;
             $arrayRequest = array(
                 "operacion" => "consultar_comprobante",
                 "tipo_de_comprobante" => $typeDocument,
                 "serie" => $serie,
                 "numero" => $serieNumber,
             );    
-            $url = NUBEFACT_URL;
-                $token = NUBEFACT_TOKEN;
+            if (is_null($ruc)){
+                $ruc = "20601285101";
+            }
+            $url = NUBEFACT_ARRAY_URL[$ruc] ?? NUBEFACT_URL;
+            $token = NUBEFACT_ARRAY_TOKEN[$ruc] ?? NUBEFACT_TOKEN;
                 $responseParsed = $arrayRequest;
                 $response = \Http::withToken($token)->post($url, $responseParsed );
                 if ($response->ok()){
@@ -442,6 +448,7 @@ class ApiInvoice extends Controller
             return response()->json($result_response, 200);  
     }
     public function QueryInvoiceQR(Request $request){
+        $ruc = null;
         $typeDocument='';
         switch ($request->codCPE) {
             case '01':
@@ -460,21 +467,25 @@ class ApiInvoice extends Controller
     try {
         $serie= $request->numSerieCPE;
         $serieNumber= (int)$request->numCPE;
+        $ruc=$request->numDoc ?? null;
         $arrayRequest = array(
             "operacion" => "consultar_comprobante",
             "tipo_de_comprobante" => $typeDocument,
             "serie" => $serie,
             "numero" => $serieNumber,
         );    
-        $url = NUBEFACT_URL;
-            $token = NUBEFACT_TOKEN;
+        if (is_null($ruc)){
+            $ruc = "20601285101";
+        }
+        $url = NUBEFACT_ARRAY_URL[$ruc] ?? NUBEFACT_URL;
+        $token = NUBEFACT_ARRAY_TOKEN[$ruc] ?? NUBEFACT_TOKEN;
             $responseParsed = $arrayRequest;
             $response = \Http::withToken($token)->post($url, $responseParsed );
             if ($response->ok()){
                 $responseJson = json_decode($response);
                 $codigoQR = QrCode::format('png')->size(300)->margin(6)->generate($responseJson->cadena_para_codigo_qr);
                 $result_response = array(
-                    "codigo" => "0",
+                    "codigo" => 0,
                     "mensaje" => "OK",
                     "pdfQRCode" => base64_encode($codigoQR)
                 );
@@ -499,7 +510,7 @@ class ApiInvoice extends Controller
     }
 
     public function QueryInvoiceSandbox(Request $request){
-        \Log::info($request->all());
+        $ruc = null;
         $typeDocument='';
             switch ($request->codCPE) {
                 case '01':
@@ -524,9 +535,12 @@ class ApiInvoice extends Controller
                 "serie" => $serie,
                 "numero" => $serieNumber,
             );    
-            $url = NUBEFACT_URL;
-                $token = NUBEFACT_TOKEN;
-                $responseParsed = $arrayRequest;
+            if (is_null($ruc)){
+                $ruc = "20601285101";
+            }
+            $url = NUBEFACT_ARRAY_URL[$ruc] ?? NUBEFACT_URL;
+            $token = NUBEFACT_ARRAY_TOKEN[$ruc] ?? NUBEFACT_TOKEN;
+            $responseParsed = $arrayRequest;
                 $response = \Http::withToken($token)->post($url, $responseParsed );
                 if ($response->ok()){
                     $responseJson = json_decode($response);
@@ -559,7 +573,7 @@ class ApiInvoice extends Controller
             return response()->json($result_response, 200);  
     }
     public function CancelInvoiceQuerySandbox(Request $request){
-        \Log::info($request->all());
+        $ruc = null;
         $typeDocument='';
             switch ($request->codCPE) {
                 case '01':
@@ -584,8 +598,11 @@ class ApiInvoice extends Controller
                 "serie" => $serie,
                 "numero" => $serieNumber,
             );    
-            $url = NUBEFACT_URL;
-                $token = NUBEFACT_TOKEN;
+            if (is_null($ruc)){
+                $ruc = "20601285101";
+            }
+            $url = NUBEFACT_ARRAY_URL[$ruc] ?? NUBEFACT_URL;
+            $token = NUBEFACT_ARRAY_TOKEN[$ruc] ?? NUBEFACT_TOKEN;
                 $responseParsed = $arrayRequest;
                 $response = \Http::withToken($token)->post($url, $responseParsed );
                 if ($response->ok()){
@@ -620,7 +637,7 @@ class ApiInvoice extends Controller
     }
     public function CancelInvoiceSandbox(Request $request){
         try {
-            \Log::info($request->all());
+            $ruc = null;
             $typeDocument='';
                 switch ($request->codCPE) {
                     case '01':
@@ -648,8 +665,11 @@ class ApiInvoice extends Controller
                 "motivo"=> $observation,
                 "codigo_unico"=> "" 
             );          
-            $url = NUBEFACT_URL;
-            $token = NUBEFACT_TOKEN;
+            if (is_null($ruc)){
+                $ruc = "20601285101";
+            }
+            $url = NUBEFACT_ARRAY_URL[$ruc] ?? NUBEFACT_URL;
+            $token = NUBEFACT_ARRAY_TOKEN[$ruc] ?? NUBEFACT_TOKEN;
             $responseParsed = $arrayRequest;
             $response = \Http::withToken($token)->post($url, $responseParsed );
             if ($response->ok()){

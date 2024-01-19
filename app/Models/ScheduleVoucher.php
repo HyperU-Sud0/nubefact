@@ -16,6 +16,7 @@ class ScheduleVoucher extends Model
     protected $fillable = [
         'serie',
         'number',
+        'docnumber',
         'status',
     ];
     

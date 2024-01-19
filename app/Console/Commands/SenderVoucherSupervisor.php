@@ -32,7 +32,7 @@ class SenderVoucherSupervisor extends Command
         $getInvoice = \App\Models\ScheduleVoucher::where('status',0)->get();
         if (count($getInvoice)>0){
             foreach ($getInvoice as $invoice) {
-                $responseInvoice = $this->sendToNubefact($invoice->serie, $invoice->number);
+                $responseInvoice = $this->sendToNubefact($invoice->serie, $invoice->number, $invoice->docnumber);
                 if ($responseInvoice->status)
                 {
                     $invoice->status = 1;
@@ -48,7 +48,7 @@ class SenderVoucherSupervisor extends Command
         }
         return Command::SUCCESS;
     }
-    public function sendToNubefact($serie, $number){
+    public function sendToNubefact($serie, $number, $ruc){
         try {
             $arrayRequest = array(
                 "operacion" => "generar_anulacion",
@@ -58,8 +58,8 @@ class SenderVoucherSupervisor extends Command
                 "motivo"=> "CANCELADO",
                 "codigo_unico"=> "" 
             );  
-                $url = NUBEFACT_URL;
-                $token = NUBEFACT_TOKEN;
+            $url = NUBEFACT_ARRAY_URL[$ruc] ?? NUBEFACT_URL;
+            $token = NUBEFACT_ARRAY_TOKEN[$ruc] ?? NUBEFACT_TOKEN;
                 $response = \Http::withToken($token)->post($url, $arrayRequest );
                 $responseStatus = new \stdClass;
                 $responseStatus->status = false;
