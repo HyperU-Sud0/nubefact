@@ -37,7 +37,7 @@ class SenderVoucherSupervisor extends Command
                 {
                     $invoice->status = 1;
                     $invoice->save();
-                    $responseOSI = $this->sendToOSI($invoice->serie, $invoice->number,$responseInvoice->ticket, $responseInvoice->description);
+                    $responseOSI = $this->sendToOSI($invoice->serie, $invoice->number,$responseInvoice->ticket, $responseInvoice->description, $invoice->docnumber);
                     if ($responseOSI){
                         \Log::info("Boleta de venta: $invoice->serie-$invoice->number enviada correctamente a OSI");
                     } else {
@@ -82,7 +82,7 @@ class SenderVoucherSupervisor extends Command
             }
         return $responseStatus;
     }
-    public function sendToOSI($serie, $number, $ticket, $description){
+    public function sendToOSI($serie, $number, $ticket, $description, $ruc){
         $responseStatus=false;
         try {
             $arrayRequest = array(
@@ -90,12 +90,13 @@ class SenderVoucherSupervisor extends Command
                 "number" => $number,
                 "ticket" => $ticket,
                 "comment" => $description,
+                "ruc" => $ruc
             );  
                 $url = OSI_URL;
                 $response = \Http::post($url, $arrayRequest);
             if ($response->ok()){
                 $responseJson = json_decode($response);
-                if ($responseJson->status){
+                if ($responseJson->accept){
                     $responseStatus=true;
                 } else {
                     \Log::info($responseStatus->message);
@@ -103,7 +104,6 @@ class SenderVoucherSupervisor extends Command
             }
             } catch (\Throwable $th) {
             \Log::error($th);
-            
             }
         return $responseStatus;
     }

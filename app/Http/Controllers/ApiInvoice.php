@@ -126,7 +126,7 @@ class ApiInvoice extends Controller
         }
     $serie_Number=explode('-', $requestSerie);
     $dateEmition = \Carbon\Carbon::parse($requestDateEmition)->format('d-m-Y');
-    $docType=(int)$requestDocType;
+    $docType=$requestDocType;
     $docNumber=$requestDocNumber;
     $customerName= $requestCustomerName;
     $customerAddress= $requestCustomerAddress;
