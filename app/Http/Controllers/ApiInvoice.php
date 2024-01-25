@@ -17,6 +17,8 @@ class ApiInvoice extends Controller
             $docModifySerie = "";
             $docModifyNumber = "";
             $ruc = null;
+            $globalDescuento = "";
+            $totalDescuento ="";
             /** EMISION DE FACTURA */
            if (isset($bodyResponseContent->factura)){
             $requestCodTypeDocument = "01";
@@ -31,6 +33,8 @@ class ApiInvoice extends Controller
             $requestTotal =$bodyResponseContent->factura->CAB->importeTotal ?? "";
             $requestItemsCount = $bodyResponseContent->factura->DET ?? "";
             $ruc = $bodyResponseContent->factura->EMI->numeroDocId ?? null;
+            $globalDescuento = $bodyResponseContent->factura->CAB->cargoDescuento[0]->montoCargoDescuento ?? "";
+            $totalDescuento = $bodyResponseContent->factura->CAB->cargoDescuento[0]->montoBaseCargoDescuento ?? "";
            }
            /** EMISION DE BOLETA */
            if (isset($bodyResponseContent->boleta)){
@@ -46,7 +50,9 @@ class ApiInvoice extends Controller
             $requestTotal =$bodyResponseContent->boleta->CAB->importeTotal ?? "";
             $requestItemsCount = $bodyResponseContent->boleta->DET ?? "";
             $ruc = $bodyResponseContent->boleta->EMI->numeroDocId ?? null;
-           }
+            $globalDescuento = $bodyResponseContent->boleta->CAB->cargoDescuento[0]->montoCargoDescuento ?? "";
+            $totalDescuento = $bodyResponseContent->boleta->CAB->cargoDescuento[0]->montoBaseCargoDescuento ?? "";   
+        }
            /** EMISION DE NOTA DE CREDITO */
            if (isset($bodyResponseContent->notaCredito)){
             $requestCodTypeDocument = "07";
@@ -62,6 +68,8 @@ class ApiInvoice extends Controller
             $requestItemsCount = $bodyResponseContent->notaCredito->DET ?? "";
             $typeNoteCredit = (int)$bodyResponseContent->notaCredito->DRF[0]->codigoMotivo ?? "";
             $ruc = $bodyResponseContent->notaCredito->EMI->numeroDocId ?? null;
+            $globalDescuento = $bodyResponseContent->notaCredito->CAB->cargoDescuento[0]->montoCargoDescuento ?? "";
+            $totalDescuento = $bodyResponseContent->notaCredito->CAB->cargoDescuento[0]->montoBaseCargoDescuento ?? "";
             if (isset($bodyResponseContent->notaCredito->DRF[0]->tipoDocRelacionado)){
                 switch ($bodyResponseContent->notaCredito->DRF[0]->tipoDocRelacionado) {
                 case '01':
@@ -93,6 +101,8 @@ class ApiInvoice extends Controller
                 $requestItemsCount = $bodyResponseContent->notaDebito->DET ?? "";
                 $typeNoteDebit = (int)$bodyResponseContent->notaDebito->DRF[0]->codigoMotivo ?? "";
                 $ruc = $bodyResponseContent->notaDebito->EMI->numeroDocId ?? null;
+                $globalDescuento = $bodyResponseContent->notaDebito->CAB->cargoDescuento[0]->montoCargoDescuento ?? "";
+                $totalDescuento = $bodyResponseContent->notaDebito->CAB->cargoDescuento[0]->montoBaseCargoDescuento ?? "";
                 if (isset($bodyResponseContent->notaDebito->DRF[0]->tipoDocRelacionado)){
                     switch ($bodyResponseContent->notaDebito->DRF[0]->tipoDocRelacionado) {
                     case '01':
@@ -171,8 +181,8 @@ class ApiInvoice extends Controller
         "moneda" => 1,
         "tipo_de_cambio" => "",
         "porcentaje_de_igv"=> 18.00,
-        "descuento_global"=> "",
-        "total_descuento"=> "",
+        "descuento_global"=> $globalDescuento,
+        "total_descuento"=> $totalDescuento,
         "total_anticipo"=> "",
         "total_gravada"=> $gravada,
         "total_inafecta"=> "",
@@ -232,6 +242,7 @@ class ApiInvoice extends Controller
             "responseContent" => $responseJson->errors,
             "pseRequests" => []
         );
+        \Log::info($response);
     }
         } catch (\Throwable $th) {
             \Log::error($th);
